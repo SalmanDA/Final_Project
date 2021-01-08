@@ -12,18 +12,20 @@ public class GamePanel extends JPanel implements ActionListener {
 	public static final int UNIT_SIZE = 25;
 	public static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / (UNIT_SIZE * UNIT_SIZE);
 	static final int DELAY = 175;
-	final int x = 0;
-	final int y = 0;
-	int bodyParts = 10;
-	int applesEaten;
+
+	int point = 0;
 	int appleX;
 	int appleY;
-	char direction = 'R';
+	int mAppleX;
+	int mAppleY;
+	boolean applePlace;
+
 	boolean running = true;
 	Timer timer;
 	Random random;
 	private Apple apples;
 	private Head snake;
+	private MagicApple mApple = new MagicApple(false);
 
 	public GamePanel() {
 		random = new Random();
@@ -35,12 +37,11 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	private void initGamePanel() {
-//	     System.out.println("jalan");
-		snake = new Head(x, y);
-		newApple();
+//    	System.out.println("jalan");
+		snake = new Head(0, 0);
+//    	newApple();
+		apples = new Apple(1000 / 2, 500 / 2);
 		running = true;
-//	        spaceship = new SpaceShip(ICRAFT_X, ICRAFT_Y);
-//	        initAliens();
 		timer = new Timer(DELAY, this);
 		timer.start();
 	}
@@ -51,16 +52,19 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void draw(Graphics g) {
-		// System.out.println("jalan");
+//		System.out.println("jalan");
 		if (running) {
 
-			// System.out.println("jalan");
 			g.drawImage(apples.getImage(), apples.getX(), apples.getY(), this);
-			// System.out.println("jalan");
+
+			if (mApple.isVisible()) {
+				g.drawImage(mApple.getImage(), mApple.getX(), mApple.getY(), this);
+			}
+//			System.out.println("jalan");
 			for (int i = 0; i < snake.bodyLength; i++) {
-//	    System.out.println("jalan");
+//				System.out.println("jalan");
 				if (i == 0) {
-//	     System.out.println("jalan");
+//					System.out.println("jalan");
 					g.drawImage(snake.getImage(), snake.getX(), snake.getY(), this);
 					g.drawImage(snake.bodyParts[i].getImage(), snake.bodyParts[i].getX(), snake.bodyParts[i].getY(),
 							this);
@@ -72,39 +76,50 @@ public class GamePanel extends JPanel implements ActionListener {
 			g.setColor(Color.WHITE);
 			g.setFont(new Font("Ink Free", Font.BOLD, 40));
 			FontMetrics metrics = getFontMetrics(g.getFont());
-			g.drawString("Score: " + applesEaten, (SCREEN_WIDTH - metrics.stringWidth("Score: " + applesEaten)) / 2,
+			g.drawString("Score: " + point, (SCREEN_WIDTH - metrics.stringWidth("Score: " + point)) / 2,
 					g.getFont().getSize());
 		} else {
 			gameOver(g);
 		}
 
 	}
-
+	
 	public void newApple() {
 		appleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
 		appleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
-		apples = new Apple(appleX, appleY);
+		
+		apples.setX(appleX);
+		apples.setY(appleY);
 	}
 
-	// public void move(){
-	// snake.move();
-	// }
-	public void checkApple() {
-		// System.out.println("lewat");
-		if ((snake.getX() == appleX) && (snake.getY() == appleY)) {
-			// apples=null;
-			// snake.bodyLength++;
-			snake.grow();
-			applesEaten++;
-			newApple();
-		}
+	public void newMagicApple() {
+		mAppleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
+		mAppleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+
+		mApple = new MagicApple(mAppleX, mAppleY, true);
 	}
 
 	public void checkCollisions() {
 		running = snake.checkCollisions();
-
 		if (!running) {
 			timer.stop();
+		}
+
+		Rectangle rs = snake.getBounds();
+		Rectangle ra = apples.getBounds();
+		if (rs.intersects(ra)) {
+			snake.grow();
+			point += 3;
+			newApple();
+		}
+
+		if (mApple.isVisible()) {
+			Rectangle rma = mApple.getBounds();
+			if (rs.intersects(rma)) {
+				snake.grow();
+				point += 10;
+				mApple.setVisible(false);
+			}
 		}
 	}
 
@@ -113,7 +128,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		g.setColor(Color.red);
 		g.setFont(new Font("Ink Free", Font.BOLD, 40));
 		FontMetrics metrics1 = getFontMetrics(g.getFont());
-		g.drawString("Score: " + applesEaten, (SCREEN_WIDTH - metrics1.stringWidth("Score: " + applesEaten)) / 2,
+		g.drawString("Score: " + point, (SCREEN_WIDTH - metrics1.stringWidth("Score: " + point)) / 2,
 				g.getFont().getSize());
 		// Game Over text
 		g.setColor(Color.red);
@@ -126,11 +141,13 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 
 		if (running) {
-			// move();
-			checkApple();
-			snake.move();
-			// move();
 			checkCollisions();
+			if(point % 4 == 0 && point != 0) {
+//				mApple.setVisible(true);
+				newMagicApple();
+			}
+//			checkCollisions();
+			snake.move();
 		}
 		repaint();
 	}
