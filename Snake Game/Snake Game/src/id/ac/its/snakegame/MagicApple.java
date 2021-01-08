@@ -11,10 +11,12 @@ public class MagicApple extends Sprite {
 	public MagicApple(int x, int y, boolean visible) {
 		super(x, y);
 		n = randomNumbers.nextInt(10);
-// 		if(n==7) {
+		System.out.println(n+"\n");
+ 		if(n%2==0) {
  			this.visible = visible;
  			initMagicApple();
-// 		}
+ 		} else
+ 			this.visible = false;
 			
 	}
 

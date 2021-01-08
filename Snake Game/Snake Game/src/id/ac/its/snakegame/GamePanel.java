@@ -85,17 +85,42 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 	
 	public void newApple() {
-		appleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
-		appleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+		do {
+			appleX = random.nextInt((int)(SCREEN_WIDTH/UNIT_SIZE))*UNIT_SIZE;
+			appleY = random.nextInt((int)(SCREEN_HEIGHT/UNIT_SIZE))*UNIT_SIZE;
+			for(int i=0;i<snake.bodyLength;i++) {
+				if(appleX == snake.bodyParts[i].getX() && appleY == snake.bodyParts[i].getY()) {
+					applePlace=false;
+					break;
+				}
+				else
+					applePlace=true;
+			}			
+		} while(!applePlace);
 		
 		apples.setX(appleX);
 		apples.setY(appleY);
 	}
 
 	public void newMagicApple() {
-		mAppleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
-		mAppleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
-
+		do {
+			mAppleX = random.nextInt((int)(SCREEN_WIDTH/UNIT_SIZE))*UNIT_SIZE;
+			mAppleY = random.nextInt((int)(SCREEN_HEIGHT/UNIT_SIZE))*UNIT_SIZE;
+			for(int i=0;i<snake.bodyLength;i++) {
+				if(mAppleX == snake.bodyParts[i].getY() && mAppleY == snake.bodyParts[i].getY()) {
+					applePlace=false;
+					break;
+				}
+				else
+					applePlace=true;
+			}
+			if(mAppleX == appleX && mAppleY == appleY) {
+				applePlace=false;
+			}
+			else
+				applePlace=true;
+		} while(!applePlace);
+		
 		mApple = new MagicApple(mAppleX, mAppleY, true);
 	}
 
@@ -142,7 +167,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 		if (running) {
 			checkCollisions();
-			if(point % 4 == 0 && point != 0) {
+			if(point % 4 == 0 && point != 0 && !mApple.isVisible()) {
 //				mApple.setVisible(true);
 				newMagicApple();
 			}

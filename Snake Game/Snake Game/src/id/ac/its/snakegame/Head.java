@@ -34,7 +34,6 @@ public class Head extends Sprite {
 
 	public void move() {
 		for (int i = bodyLength - 1; i >= 0; i--) {
-			System.out.println(i);
 			if (i == 0) {
 				bodyParts[i].setX(x);
 				bodyParts[i].setY(y);
@@ -65,28 +64,27 @@ public class Head extends Sprite {
 		// checks if head collides with body
 		for (int i = bodyLength - 1; i >= 0; i--) {
 			if (x == bodyParts[i].getX() && y == bodyParts[i].getY()) {
-				System.out.println("stop0");
 				running = false;
 			}
 		}
 		// check if head touches left border
 		if (x < 0) {
-			System.out.println("stop1" + x);
+
 			running = false;
 		}
 		// check if head touches right border
 		if (x > GamePanel.SCREEN_WIDTH) {
-			System.out.println("stop2");
+
 			running = false;
 		}
 		// check if head touches top border
 		if (y < 0) {
-			System.out.println("stop3");
+
 			running = false;
 		}
 		// check if head touches bottom border
 		if (y > GamePanel.SCREEN_HEIGHT) {
-			System.out.println("stop4");
+
 			running = false;
 		}
 
