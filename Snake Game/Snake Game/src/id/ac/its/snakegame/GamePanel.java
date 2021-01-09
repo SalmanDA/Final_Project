@@ -19,6 +19,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	int mAppleX;
 	int mAppleY;
 	boolean applePlace;
+	boolean mAppleTrig=false;
+	int mAppleCountDown=0;
 
 	boolean running = true;
 	Timer timer;
@@ -40,7 +42,7 @@ public class GamePanel extends JPanel implements ActionListener {
 //    	System.out.println("jalan");
 		snake = new Head(0, 0);
 //    	newApple();
-		apples = new Apple(1000 / 2, 500 / 2);
+		apples = new Apple(SCREEN_WIDTH/ 2, SCREEN_HEIGHT/ 2);
 		running = true;
 		timer = new Timer(DELAY, this);
 		timer.start();
@@ -134,7 +136,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		Rectangle ra = apples.getBounds();
 		if (rs.intersects(ra)) {
 			snake.grow();
-			point += 3;
+			point += 1;
 			newApple();
 		}
 
@@ -144,6 +146,8 @@ public class GamePanel extends JPanel implements ActionListener {
 				snake.grow();
 				point += 10;
 				mApple.setVisible(false);
+				mAppleTrig=false;
+				mAppleCountDown=0;
 			}
 		}
 	}
@@ -166,12 +170,23 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 
 		if (running) {
-			checkCollisions();
-			if(point % 4 == 0 && point != 0 && !mApple.isVisible()) {
-//				mApple.setVisible(true);
-				newMagicApple();
-			}
 //			checkCollisions();
+			if(point % 4 == 0 && point != 0 && !mApple.isVisible() && !mAppleTrig) {
+				mAppleTrig=true;
+				newMagicApple();
+			} else if(point % 4 != 0) {
+				mAppleTrig=false;
+			}
+			if(mApple.isVisible()) {
+				if(e.getSource() == timer) {
+					mAppleCountDown++;
+					System.out.println("timer: "+mAppleCountDown);
+				}
+				if(mAppleCountDown == 60) {
+					mApple.setVisible(false);
+				}
+			}
+			checkCollisions();
 			snake.move();
 		}
 		repaint();

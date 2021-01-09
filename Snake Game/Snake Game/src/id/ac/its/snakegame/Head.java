@@ -9,7 +9,7 @@ public class Head extends Sprite {
 // private MyRectangle[] body;
 	Body bodyParts[] = new Body[GamePanel.GAME_UNITS];
 // Body[] bodyParts;
-	int bodyLength = 10;
+	int bodyLength = 4;
 
 	public Head(int x, int y) {
 		super(x, y);
@@ -73,7 +73,7 @@ public class Head extends Sprite {
 			running = false;
 		}
 		// check if head touches right border
-		if (x > GamePanel.SCREEN_WIDTH) {
+		if (x >= GamePanel.SCREEN_WIDTH) {
 
 			running = false;
 		}
@@ -83,7 +83,7 @@ public class Head extends Sprite {
 			running = false;
 		}
 		// check if head touches bottom border
-		if (y > GamePanel.SCREEN_HEIGHT) {
+		if (y >= GamePanel.SCREEN_HEIGHT) {
 
 			running = false;
 		}
