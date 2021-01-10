@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.Random;
+import java.util.List;
+import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements ActionListener {
 
@@ -19,16 +21,23 @@ public class GamePanel extends JPanel implements ActionListener {
 	int mAppleX;
 	int mAppleY;
 	boolean applePlace;
-	boolean mAppleTrig=false;
-	int mAppleCountDown=0;
-
+	boolean mAppleTrig = false;
+	int mAppleCountDown = 0;
+	int poisonX;
+	int poisonY;
+	boolean poisonON = false;
+	int poisonCountDown = 0;
+	
+	
 	boolean running = true;
 	Timer timer;
 	Random random;
 	private Apple apples;
 	private Head snake;
 	private MagicApple mApple = new MagicApple(false);
-
+	private List<Poison> poisons;
+	
+	
 	public GamePanel() {
 		random = new Random();
 		addKeyListener(new MyKeyAdapter());
@@ -42,7 +51,7 @@ public class GamePanel extends JPanel implements ActionListener {
 //    	System.out.println("jalan");
 		snake = new Head(0, 0);
 //    	newApple();
-		apples = new Apple(SCREEN_WIDTH/ 2, SCREEN_HEIGHT/ 2);
+		apples = new Apple(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		running = true;
 		timer = new Timer(DELAY, this);
 		timer.start();
@@ -62,6 +71,13 @@ public class GamePanel extends JPanel implements ActionListener {
 			if (mApple.isVisible()) {
 				g.drawImage(mApple.getImage(), mApple.getX(), mApple.getY(), this);
 			}
+			
+			if(poisonON) {
+			    for(int i=0;i<poisons.size();i++) {
+			     g.drawImage(poisons.get(i).getImage(), poisons.get(i).getX(), poisons.get(i).getY(), this);
+			    }
+			   }
+			
 //			System.out.println("jalan");
 			for (int i = 0; i < snake.bodyLength; i++) {
 //				System.out.println("jalan");
@@ -85,45 +101,68 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 
 	}
-	
+
 	public void newApple() {
 		do {
-			appleX = random.nextInt((int)(SCREEN_WIDTH/UNIT_SIZE))*UNIT_SIZE;
-			appleY = random.nextInt((int)(SCREEN_HEIGHT/UNIT_SIZE))*UNIT_SIZE;
-			for(int i=0;i<snake.bodyLength;i++) {
-				if(appleX == snake.bodyParts[i].getX() && appleY == snake.bodyParts[i].getY()) {
-					applePlace=false;
+			appleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
+			appleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+			for (int i = 0; i < snake.bodyLength; i++) {
+				if (appleX == snake.bodyParts[i].getX() && appleY == snake.bodyParts[i].getY()) {
+					applePlace = false;
 					break;
-				}
-				else
-					applePlace=true;
-			}			
-		} while(!applePlace);
-		
+				} else
+					applePlace = true;
+			}
+		} while (!applePlace);
+
 		apples.setX(appleX);
 		apples.setY(appleY);
 	}
 
 	public void newMagicApple() {
 		do {
-			mAppleX = random.nextInt((int)(SCREEN_WIDTH/UNIT_SIZE))*UNIT_SIZE;
-			mAppleY = random.nextInt((int)(SCREEN_HEIGHT/UNIT_SIZE))*UNIT_SIZE;
-			for(int i=0;i<snake.bodyLength;i++) {
-				if(mAppleX == snake.bodyParts[i].getY() && mAppleY == snake.bodyParts[i].getY()) {
-					applePlace=false;
+			mAppleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
+			mAppleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+			for (int i = 0; i < snake.bodyLength; i++) {
+				if (mAppleX == snake.bodyParts[i].getY() && mAppleY == snake.bodyParts[i].getY()) {
+					applePlace = false;
 					break;
-				}
-				else
-					applePlace=true;
+				} else
+					applePlace = true;
 			}
-			if(mAppleX == appleX && mAppleY == appleY) {
-				applePlace=false;
-			}
-			else
-				applePlace=true;
-		} while(!applePlace);
-		
+			if (mAppleX == appleX && mAppleY == appleY) {
+				applePlace = false;
+			} else
+				applePlace = true;
+		} while (!applePlace);
+
 		mApple = new MagicApple(mAppleX, mAppleY, true);
+	}
+
+	public void newPoison() {
+		poisons = new ArrayList<>();
+		for (int i = 0; i < 5; i++) {
+			do {
+				poisonX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
+				poisonY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+				for (int j = 0; j < snake.bodyLength; j++) {
+					if (poisonX == snake.bodyParts[i].getY() && poisonY == snake.bodyParts[i].getY()) {
+						applePlace = false;
+						break;
+					} else
+						applePlace = true;
+				}
+				if (poisonX == appleX && poisonY == appleY && applePlace) {
+					applePlace = false;
+				} else if (applePlace) // supaya gambar tidak saling menimpa dengan badan ular
+					applePlace = true;
+				if (mApple.isVisible() && poisonX == mAppleX && poisonY == mAppleY && applePlace) {
+					applePlace = false;
+				} else if (applePlace) // supaya gambar tidak saling menimpa dengan badan ular
+					applePlace = true;
+			} while (!applePlace);
+			poisons.add(new Poison(poisonX, poisonY, true));
+		}
 	}
 
 	public void checkCollisions() {
@@ -146,10 +185,27 @@ public class GamePanel extends JPanel implements ActionListener {
 				snake.grow();
 				point += 10;
 				mApple.setVisible(false);
-				mAppleTrig=false;
-				mAppleCountDown=0;
+				mAppleTrig = false;
+				mAppleCountDown = 0;
 			}
 		}
+
+		if (poisonON) {
+			for (int i = 0; i < poisons.size(); i++) {
+				Rectangle rp = poisons.get(i).getBounds();
+				if (rs.intersects(rp)) {
+					point -= 5;
+					if (point < 0)
+						point = 0;
+					poisons.remove(i);
+				}
+			}
+			if (poisons.isEmpty()) {
+				poisonCountDown = 0;
+				poisonON = false;
+			}
+		}
+
 	}
 
 	public void gameOver(Graphics g) {
@@ -171,21 +227,41 @@ public class GamePanel extends JPanel implements ActionListener {
 
 		if (running) {
 //			checkCollisions();
-			if(point % 4 == 0 && point != 0 && !mApple.isVisible() && !mAppleTrig) {
-				mAppleTrig=true;
+			if (point % 4 == 0 && point != 0 && !mApple.isVisible() && !mAppleTrig) {
+				mAppleTrig = true;
 				newMagicApple();
-			} else if(point % 4 != 0) {
-				mAppleTrig=false;
+			} else if (point % 4 != 0) {
+				mAppleTrig = false;
 			}
-			if(mApple.isVisible()) {
-				if(e.getSource() == timer) {
+			if (mApple.isVisible()) {
+				if (e.getSource() == timer) {
 					mAppleCountDown++;
-					System.out.println("timer: "+mAppleCountDown);
+					System.out.println("timer: " + mAppleCountDown);
 				}
-				if(mAppleCountDown == 60) {
+				if (mAppleCountDown == 60) {
+					mAppleCountDown = 0;
 					mApple.setVisible(false);
 				}
 			}
+
+			if (point % 6 == 0 && point != 0 && !poisonON) {
+				newPoison();
+				poisonON = true;
+			}
+			if (poisonON) {
+				if (e.getSource() == timer) {
+					poisonCountDown++;
+					System.out.println("poison: " + poisonCountDown);
+				}
+				if (poisonCountDown == 150) {
+					poisonCountDown = 0;
+					poisonON = false;
+					for (int i = 0; i < poisons.size(); i++) {
+						poisons.remove(i);
+					}
+				}
+			}
+
 			checkCollisions();
 			snake.move();
 		}
