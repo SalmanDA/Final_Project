@@ -13,7 +13,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public static final int SCREEN_HEIGHT = 500;
 	public static final int UNIT_SIZE = 25;
 	public static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / (UNIT_SIZE * UNIT_SIZE);
-	static final int DELAY = 175;
+	int DELAY = 175;
 
 	int point = 0;
 	int appleX;
@@ -27,17 +27,16 @@ public class GamePanel extends JPanel implements ActionListener {
 	int poisonY;
 	boolean poisonON = false;
 	int poisonCountDown = 0;
-	
-	
-	boolean running = true;
+
+	int running; // case of running {0 main menu, 1 game running, 2 Game Over, 5 highScore, 4
+					// Credit, 3 level
 	Timer timer;
 	Random random;
 	private Apple apples;
 	private Head snake;
 	private MagicApple mApple = new MagicApple(false);
 	private List<Poison> poisons;
-	
-	
+
 	public GamePanel() {
 		random = new Random();
 		addKeyListener(new MyKeyAdapter());
@@ -52,7 +51,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		snake = new Head(0, 0);
 //    	newApple();
 		apples = new Apple(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-		running = true;
+		running = 1;
 		timer = new Timer(DELAY, this);
 		timer.start();
 	}
@@ -64,22 +63,22 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void draw(Graphics g) {
 //		System.out.println("jalan");
-		if (running) {
+		if (running == 1) {
 
 			g.drawImage(apples.getImage(), apples.getX(), apples.getY(), this);
 
 			if (mApple.isVisible()) {
 				g.drawImage(mApple.getImage(), mApple.getX(), mApple.getY(), this);
 			}
-			
-			if(poisonON) {
-			    for(int i=0;i<poisons.size();i++) {
-			     g.drawImage(poisons.get(i).getImage(), poisons.get(i).getX(), poisons.get(i).getY(), this);
-			    }
-			   }
-			
+
+			if (poisonON) {
+				for (int i = 0; i < poisons.size(); i++) {
+					g.drawImage(poisons.get(i).getImage(), poisons.get(i).getX(), poisons.get(i).getY(), this);
+				}
+			}
+
 //			System.out.println("jalan");
-			for (int i = 0; i < snake.bodyLength; i++) {
+			for (int i = 0; i < snake.getBodyLength(); i++) {
 //				System.out.println("jalan");
 				if (i == 0) {
 //					System.out.println("jalan");
@@ -96,8 +95,10 @@ public class GamePanel extends JPanel implements ActionListener {
 			FontMetrics metrics = getFontMetrics(g.getFont());
 			g.drawString("Score: " + point, (SCREEN_WIDTH - metrics.stringWidth("Score: " + point)) / 2,
 					g.getFont().getSize());
-		} else {
+		} else if (running == 2) {
 			gameOver(g);
+		} else if (running == 4) {
+			credit(g);
 		}
 
 	}
@@ -106,7 +107,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		do {
 			appleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
 			appleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
-			for (int i = 0; i < snake.bodyLength; i++) {
+			for (int i = 0; i < snake.getBodyLength(); i++) {
 				if (appleX == snake.bodyParts[i].getX() && appleY == snake.bodyParts[i].getY()) {
 					applePlace = false;
 					break;
@@ -123,7 +124,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		do {
 			mAppleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
 			mAppleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
-			for (int i = 0; i < snake.bodyLength; i++) {
+			for (int i = 0; i < snake.getBodyLength(); i++) {
 				if (mAppleX == snake.bodyParts[i].getY() && mAppleY == snake.bodyParts[i].getY()) {
 					applePlace = false;
 					break;
@@ -145,7 +146,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			do {
 				poisonX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
 				poisonY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
-				for (int j = 0; j < snake.bodyLength; j++) {
+				for (int j = 0; j < snake.getBodyLength(); j++) {
 					if (poisonX == snake.bodyParts[i].getY() && poisonY == snake.bodyParts[i].getY()) {
 						applePlace = false;
 						break;
@@ -166,9 +167,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void checkCollisions() {
-		running = snake.checkCollisions();
-		if (!running) {
-			timer.stop();
+		if (!snake.checkCollisions()) {
+			running = 2;
 		}
 
 		Rectangle rs = snake.getBounds();
@@ -208,6 +208,17 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	}
 
+	public void start() {
+		point = 0;
+		snake.setBodyLength(4);
+		DELAY = 175;
+		mAppleTrig = false;
+		poisonON = false;
+		mAppleCountDown = 0;
+		poisonCountDown = 0;
+		initGamePanel();
+	}
+
 	public void gameOver(Graphics g) {
 		// Score
 		g.setColor(Color.red);
@@ -222,10 +233,30 @@ public class GamePanel extends JPanel implements ActionListener {
 		g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
 	}
 
+	public void credit(Graphics g) {
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Calibri", 1, 40));
+		FontMetrics metrics1 = getFontMetrics(g.getFont());
+		g.drawString("Collaborator:\n", (SCREEN_WIDTH - metrics1.stringWidth("Collaborator:")) / 2,
+				g.getFont().getSize());
+		g.setFont(new Font("Calibri", 1, 30));
+		FontMetrics metrics2 = getFontMetrics(g.getFont());
+		String[] collaborator = { "Salman Damai Alfariq 159", "Muhammad Fikri Sandi Pratama 195",
+				"Muhammad Rizky Widodo 216" };
+		for (int i = 0; i < collaborator.length; i++) {
+			g.drawString(collaborator[i] + "\n", (SCREEN_WIDTH - metrics2.stringWidth(collaborator[i])) / 2,
+					g.getFont().getSize());
+		}
+		g.drawString("Dosen Pembimbing:\n", (SCREEN_WIDTH - metrics1.stringWidth("Dosen Pembimbing:")) / 2,
+				g.getFont().getSize());
+		g.drawString("Abdul Munif, S.Kom., M.Sc.\n",
+				(SCREEN_WIDTH - metrics2.stringWidth("Abdul Munif, S.Kom., M.Sc.")) / 2, g.getFont().getSize());
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		if (running) {
+		if (running == 1) {
 //			checkCollisions();
 			if (point % 4 == 0 && point != 0 && !mApple.isVisible() && !mAppleTrig) {
 				mAppleTrig = true;
@@ -272,6 +303,15 @@ public class GamePanel extends JPanel implements ActionListener {
 		@Override
 		public void keyPressed(KeyEvent e) {
 			snake.keyPressed(e);
+			int key = e.getKeyCode();
+			if (key == KeyEvent.VK_SPACE) {
+				if (running == 2) {
+					running = 4;
+				} else if (running == 4) {
+					timer.stop();
+					start();
+				}
+			}
 		}
 	}
 

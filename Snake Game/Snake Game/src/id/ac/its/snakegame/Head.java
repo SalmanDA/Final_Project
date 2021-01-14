@@ -9,7 +9,15 @@ public class Head extends Sprite {
 // private MyRectangle[] body;
 	Body bodyParts[] = new Body[GamePanel.GAME_UNITS];
 // Body[] bodyParts;
-	int bodyLength = 4;
+	private int bodyLength = 4;
+	
+	public int getBodyLength() {
+		return bodyLength;
+	}
+
+	public void setBodyLength(int bodyLength) {
+		this.bodyLength = bodyLength;
+	}
 
 	public Head(int x, int y) {
 		super(x, y);
