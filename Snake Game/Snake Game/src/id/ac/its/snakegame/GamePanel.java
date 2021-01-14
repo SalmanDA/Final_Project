@@ -37,6 +37,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	private MagicApple mApple = new MagicApple(false);
 	private List<Poison> poisons;
 
+	String[] options = {"Easy", "Hard", "Expert", "Impossible"};
+	
 	public GamePanel() {
 		random = new Random();
 		addKeyListener(new MyKeyAdapter());
@@ -51,9 +53,15 @@ public class GamePanel extends JPanel implements ActionListener {
 		snake = new Head(0, 0);
 //    	newApple();
 		apples = new Apple(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+
+		int level = JOptionPane.showOptionDialog(null, "Game Level", "Click a button", JOptionPane.DEFAULT_OPTION,
+				JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+		DELAY /= level + 1;
+
 		running = 1;
 		timer = new Timer(DELAY, this);
 		timer.start();
+
 	}
 
 	public void paintComponent(Graphics g) {
