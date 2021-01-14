@@ -36,8 +36,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	private Head snake;
 	private MagicApple mApple = new MagicApple(false);
 	private List<Poison> poisons;
-
 	String[] options = {"Easy", "Hard", "Expert", "Impossible"};
+	HighscoreManager hm = new HighscoreManager("highscore.dat");
 	
 	public GamePanel() {
 		random = new Random();
@@ -105,7 +105,9 @@ public class GamePanel extends JPanel implements ActionListener {
 					g.getFont().getSize());
 		} else if (running == 2) {
 			gameOver(g);
-		} else if (running == 4) {
+		} else if(running==3) {
+			highscore(g);
+		}else if (running == 4) {
 			credit(g);
 		}
 
@@ -177,6 +179,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void checkCollisions() {
 		if (!snake.checkCollisions()) {
 			running = 2;
+			hm.addScore("Player", point);
 		}
 
 		Rectangle rs = snake.getBounds();
@@ -239,6 +242,16 @@ public class GamePanel extends JPanel implements ActionListener {
 		g.setFont(new Font("Ink Free", Font.BOLD, 75));
 		FontMetrics metrics2 = getFontMetrics(g.getFont());
 		g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
+	}
+	
+	public void highscore(Graphics g) {
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Ink Free", 1, 40));
+		FontMetrics metrics1 = getFontMetrics(g.getFont());
+		g.drawString("High Score", (SCREEN_WIDTH - metrics1.stringWidth("High Score"))/2, g.getFont().getSize());
+		g.setFont(new Font("Calibri", 1, 30));  
+		FontMetrics metrics2 = getFontMetrics(g.getFont());
+		g.drawString(hm.getHighscoreString(), 0, 100);
 	}
 
 	public void credit(Graphics g) {
@@ -311,15 +324,18 @@ public class GamePanel extends JPanel implements ActionListener {
 		@Override
 		public void keyPressed(KeyEvent e) {
 			snake.keyPressed(e);
-			int key = e.getKeyCode();
-			if (key == KeyEvent.VK_SPACE) {
-				if (running == 2) {
-					running = 4;
-				} else if (running == 4) {
-					timer.stop();
-					start();
-				}
-			}
+            int key = e.getKeyCode();
+            if(key == KeyEvent.VK_SPACE) {
+            	if(running==2) {
+            		running=3;
+            	} else if(running==3) {
+            		running=4;
+            	}
+            	else if(running==4) {
+            		timer.stop();
+            		start();
+            	}
+            }
 		}
 	}
 
