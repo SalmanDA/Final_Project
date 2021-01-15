@@ -8,6 +8,7 @@ public class MagicApple extends Sprite {
 	int n;
 	private boolean visible;
 	
+	// Constructor
 	public MagicApple(int x, int y, boolean visible) {
 		super(x, y);
 		n = randomNumbers.nextInt(10);
@@ -20,17 +21,20 @@ public class MagicApple extends Sprite {
 			
 	}
 
+	// Constructor
 	public MagicApple(boolean visible) {
 		super();
 		this.visible = visible;
 		initMagicApple();
 	}
 
+	// Untuk memuat gambar MagicApple
 	private void initMagicApple() {
 		loadImage("img/magicapple.png");
 		getImageDimensions();
 	}
 
+	// Setter getter
 	public void setVisible(boolean visible) {
 		this.visible = visible;
 	}

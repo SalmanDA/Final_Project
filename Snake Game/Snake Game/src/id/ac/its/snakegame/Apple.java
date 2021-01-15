@@ -1,16 +1,16 @@
 package id.ac.its.snakegame;
 
-public class Apple extends Sprite{
- 
- public Apple(int x, int y) {
-  super(x, y);
-  // TODO Auto-generated constructor stub
-  initApple();
- }
+public class Apple extends Sprite {
+	// Constructor
+	public Apple(int x, int y) {
+		super(x, y);
+		initApple();
+	}
 
- private void initApple() {
-  loadImage("img/apple.png");
-        getImageDimensions();
- }
+	// Untuk memuat gambar apple
+	private void initApple() {
+		loadImage("img/apple.png");
+		getImageDimensions();
+	}
 
 }

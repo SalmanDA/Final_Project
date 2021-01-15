@@ -330,7 +330,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	// Menampilkan halaman credit
 	public void credit(Graphics g) {
 		int collaboratorTitleY, collaboratorY, dosenY, dosenTitleY, referencesTitleY, referencesY, tabWidth = 10;
-
+		
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Calibri", 1, 40));
 		FontMetrics metrics1 = getFontMetrics(g.getFont());
