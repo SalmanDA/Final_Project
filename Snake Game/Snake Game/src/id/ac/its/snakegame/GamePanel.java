@@ -36,9 +36,9 @@ public class GamePanel extends JPanel implements ActionListener {
 	private Head snake;
 	private MagicApple mApple = new MagicApple(false);
 	private List<Poison> poisons;
-	String[] options = {"Easy", "Hard", "Expert", "Impossible"};
+	String[] options = { "Easy", "Hard", "Expert", "Impossible" };
 	HighscoreManager hm = new HighscoreManager("highscore.dat");
-	
+
 	public GamePanel() {
 		random = new Random();
 		addKeyListener(new MyKeyAdapter());
@@ -105,9 +105,9 @@ public class GamePanel extends JPanel implements ActionListener {
 					g.getFont().getSize());
 		} else if (running == 2) {
 			gameOver(g);
-		} else if(running==3) {
+		} else if (running == 3) {
 			highscore(g);
-		}else if (running == 4) {
+		} else if (running == 4) {
 			credit(g);
 		}
 
@@ -243,15 +243,33 @@ public class GamePanel extends JPanel implements ActionListener {
 		FontMetrics metrics2 = getFontMetrics(g.getFont());
 		g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
 	}
-	
+
 	public void highscore(Graphics g) {
-		g.setColor(Color.WHITE);
-		g.setFont(new Font("Ink Free", 1, 40));
-		FontMetrics metrics1 = getFontMetrics(g.getFont());
-		g.drawString("High Score", (SCREEN_WIDTH - metrics1.stringWidth("High Score"))/2, g.getFont().getSize());
-		g.setFont(new Font("Calibri", 1, 30));  
-		FontMetrics metrics2 = getFontMetrics(g.getFont());
-		g.drawString(hm.getHighscoreString(), 0, 100);
+		int scoreY, scoreX, titleY, tabWidth = 10;
+		String title = "Tetap Malas, Jangan Semangat!";
+
+		Font fontTitle = new Font("Helvetica", Font.BOLD, 36);
+		FontMetrics fmTitle = getFontMetrics(fontTitle);
+		Font fontScore = new Font("Helvetica", Font.BOLD, 18);
+		FontMetrics fmScore = getFontMetrics(fontScore);
+
+		g.setColor(Color.white);
+
+		titleY = (SCREEN_HEIGHT - fmTitle.getHeight() - 20 - 5 * fmScore.getHeight()) / 2;
+		g.setFont(fontTitle);
+		g.drawString(title, (SCREEN_WIDTH - fmTitle.stringWidth(title)) / 2, titleY);
+
+		scoreY = titleY + 20 + fmTitle.getHeight();
+		g.setFont(fontScore);
+
+		for (String line : hm.getHighscoreString().split("\n")) {
+			scoreX = (SCREEN_WIDTH - fmScore.stringWidth(line) - 2 * tabWidth) / 2;
+			for (String word : line.split("\t")) {
+				g.drawString(word, scoreX, scoreY);
+				scoreX += tabWidth + fmScore.stringWidth(word);
+			}
+			scoreY += fmScore.getHeight();
+		}
 	}
 
 	public void credit(Graphics g) {
@@ -324,18 +342,17 @@ public class GamePanel extends JPanel implements ActionListener {
 		@Override
 		public void keyPressed(KeyEvent e) {
 			snake.keyPressed(e);
-            int key = e.getKeyCode();
-            if(key == KeyEvent.VK_SPACE) {
-            	if(running==2) {
-            		running=3;
-            	} else if(running==3) {
-            		running=4;
-            	}
-            	else if(running==4) {
-            		timer.stop();
-            		start();
-            	}
-            }
+			int key = e.getKeyCode();
+			if (key == KeyEvent.VK_SPACE) {
+				if (running == 2) {
+					running = 3;
+				} else if (running == 3) {
+					running = 4;
+				} else if (running == 4) {
+					timer.stop();
+					start();
+				}
+			}
 		}
 	}
 
