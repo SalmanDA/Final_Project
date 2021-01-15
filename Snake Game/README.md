@@ -41,7 +41,7 @@ Untuk menambahkan score baru ke class highscore
 Untuk menampilkan 10 score yang sudah di simpan dari setiap tingkatan level.
 
 Class Diagram Image
-![]()
+![](mudah.jpg)
 
 ### Refrensi
 1. http://zetcode.com/javagames/snake/
