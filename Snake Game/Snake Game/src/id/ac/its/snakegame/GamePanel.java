@@ -15,6 +15,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / (UNIT_SIZE * UNIT_SIZE);
 	int DELAY = 175;
 
+	int level;
 	int point = 0;
 	int appleX;
 	int appleY;
@@ -37,7 +38,10 @@ public class GamePanel extends JPanel implements ActionListener {
 	private MagicApple mApple = new MagicApple(false);
 	private List<Poison> poisons;
 	String[] options = { "Easy", "Hard", "Expert", "Impossible" };
-	HighscoreManager hm = new HighscoreManager("highscore.dat");
+	HighscoreManager easyHighscore = new HighscoreManager("easyLevel.dat");
+	HighscoreManager hardHighscore = new HighscoreManager("hardLevel.dat");
+	HighscoreManager expertHighscore = new HighscoreManager("expertLevel.dat");
+	HighscoreManager impossibleHighscore = new HighscoreManager("impossibleLevel.dat");
 
 	public GamePanel() {
 		random = new Random();
@@ -54,7 +58,7 @@ public class GamePanel extends JPanel implements ActionListener {
 //    	newApple();
 		apples = new Apple(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
-		int level = JOptionPane.showOptionDialog(null, "Game Level", "Click a button", JOptionPane.DEFAULT_OPTION,
+		level = JOptionPane.showOptionDialog(null, "Game Level", "Click a button", JOptionPane.DEFAULT_OPTION,
 				JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 		DELAY /= level + 1;
 
@@ -179,7 +183,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void checkCollisions() {
 		if (!snake.checkCollisions()) {
 			running = 2;
-			hm.addScore("Player", point);
 		}
 
 		Rectangle rs = snake.getBounds();
@@ -246,7 +249,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void highscore(Graphics g) {
 		int scoreY, scoreX, titleY, tabWidth = 10;
-		String title = "Tetap Malas, Jangan Semangat!";
+		String[] title = { "Easy level Highscore", "Hard level Highscore", "Expert level Highscore",
+				"Impossible level Highscore" };
 
 		Font fontTitle = new Font("Helvetica", Font.BOLD, 36);
 		FontMetrics fmTitle = getFontMetrics(fontTitle);
@@ -257,52 +261,88 @@ public class GamePanel extends JPanel implements ActionListener {
 
 		titleY = (SCREEN_HEIGHT - fmTitle.getHeight() - 20 - 5 * fmScore.getHeight()) / 2;
 		g.setFont(fontTitle);
-		g.drawString(title, (SCREEN_WIDTH - fmTitle.stringWidth(title)) / 2, titleY);
+		g.drawString(title[level], (SCREEN_WIDTH - fmTitle.stringWidth(title[level])) / 2, titleY);
 
 		scoreY = titleY + 20 + fmTitle.getHeight();
 		g.setFont(fontScore);
 
-		for (String line : hm.getHighscoreString().split("\n")) {
-			scoreX = (SCREEN_WIDTH - fmScore.stringWidth(line) - 2 * tabWidth) / 2;
-			for (String word : line.split("\t")) {
-				g.drawString(word, scoreX, scoreY);
-				scoreX += tabWidth + fmScore.stringWidth(word);
+		if (level == 0) {
+			for (String line : easyHighscore.getHighscoreString().split("\n")) {
+				scoreX = (SCREEN_WIDTH - fmScore.stringWidth(line) - 2 * tabWidth) / 2;
+				for (String word : line.split("\t")) {
+					g.drawString(word, scoreX, scoreY);
+					scoreX += tabWidth + fmScore.stringWidth(word);
+				}
+				scoreY += fmScore.getHeight();
 			}
-			scoreY += fmScore.getHeight();
+		} else if (level == 1) {
+			for (String line : hardHighscore.getHighscoreString().split("\n")) {
+				scoreX = (SCREEN_WIDTH - fmScore.stringWidth(line) - 2 * tabWidth) / 2;
+				for (String word : line.split("\t")) {
+					g.drawString(word, scoreX, scoreY);
+					scoreX += tabWidth + fmScore.stringWidth(word);
+				}
+				scoreY += fmScore.getHeight();
+			}
+		} else if (level == 2) {
+			for (String line : expertHighscore.getHighscoreString().split("\n")) {
+				scoreX = (SCREEN_WIDTH - fmScore.stringWidth(line) - 2 * tabWidth) / 2;
+				for (String word : line.split("\t")) {
+					g.drawString(word, scoreX, scoreY);
+					scoreX += tabWidth + fmScore.stringWidth(word);
+				}
+				scoreY += fmScore.getHeight();
+			}
+		} else {
+			for (String line : impossibleHighscore.getHighscoreString().split("\n")) {
+				scoreX = (SCREEN_WIDTH - fmScore.stringWidth(line) - 2 * tabWidth) / 2;
+				for (String word : line.split("\t")) {
+					g.drawString(word, scoreX, scoreY);
+					scoreX += tabWidth + fmScore.stringWidth(word);
+				}
+				scoreY += fmScore.getHeight();
+			}
 		}
 	}
 
 	public void credit(Graphics g) {
 		int collaboratorTitleY, collaboratorY, dosenY, dosenTitleY, referencesTitleY, referencesY, tabWidth = 10;
-		  
-		  g.setColor(Color.WHITE);
-		  g.setFont(new Font("Calibri", 1, 40));  
-		  FontMetrics metrics1 = getFontMetrics(g.getFont());
-		  g.drawString("Collaborator:\n", (SCREEN_WIDTH - metrics1.stringWidth("Collaborator:"))/2, g.getFont().getSize());
-		  
-		  g.setFont(new Font("Calibri", 1, 30));  
-		  FontMetrics metrics2 = getFontMetrics(g.getFont());
-		  collaboratorY = 35 + metrics1.getHeight();
-		  String[] collaborator = {"Salman Damai Alfariq 159", "Muhammad Fikri Sandi Pratama 195", "Muhammad Rizky Widodo 216"};
-		  for(int i=0;i<collaborator.length;i++) {
-		   g.drawString(collaborator[i]+"\n", (SCREEN_WIDTH - metrics2.stringWidth(collaborator[i]))/2, collaboratorY+metrics2.getHeight()*i);
-		  }
-		  
-		  g.setFont(new Font("Calibri", 1, 40));  
-		  dosenTitleY = 20 + collaboratorY+metrics2.getHeight()*(collaborator.length);
-		  g.drawString("Dosen Pembimbing:\n", (SCREEN_WIDTH - metrics1.stringWidth("Dosen Pembimbing:\n"))/2, dosenTitleY);
-		  g.setFont(new Font("Calibri", 1, 30));   
-		  dosenY = dosenTitleY + metrics1.getHeight();
-		  g.drawString("Abdul Munif, S.Kom., M.Sc.\n", (SCREEN_WIDTH - metrics2.stringWidth("Abdul Munif, S.Kom., M.Sc."))/2, dosenY);
 
-		  g.setFont(new Font("Calibri", 1, 40));
-		  referencesTitleY = dosenY + metrics2.getHeight() + 20;
-		  g.drawString("Referensi:\n", (SCREEN_WIDTH - metrics1.stringWidth("Referensi\n"))/2, referencesTitleY);
-		  String[] references = {"http://zetcode.com/javagames/snake/","http://forum.codecall.net/topic/50071-making-a-simple-high-score-system/"};
-		  g.setFont(new Font("Calibri", 1, 30));  
-		  for(int i=0; i<references.length; i++) {
-		   g.drawString(references[i]+"\n", (SCREEN_WIDTH - metrics2.stringWidth(references[i]))/2, referencesTitleY + metrics2.getHeight()*i + 40);
-		  }
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Calibri", 1, 40));
+		FontMetrics metrics1 = getFontMetrics(g.getFont());
+		g.drawString("Collaborator:\n", (SCREEN_WIDTH - metrics1.stringWidth("Collaborator:")) / 2,
+				g.getFont().getSize());
+
+		g.setFont(new Font("Calibri", 1, 30));
+		FontMetrics metrics2 = getFontMetrics(g.getFont());
+		collaboratorY = 35 + metrics1.getHeight();
+		String[] collaborator = { "Salman Damai Alfariq 159", "Muhammad Fikri Sandi Pratama 195",
+				"Muhammad Rizky Widodo 216" };
+		for (int i = 0; i < collaborator.length; i++) {
+			g.drawString(collaborator[i] + "\n", (SCREEN_WIDTH - metrics2.stringWidth(collaborator[i])) / 2,
+					collaboratorY + metrics2.getHeight() * i);
+		}
+
+		g.setFont(new Font("Calibri", 1, 40));
+		dosenTitleY = 20 + collaboratorY + metrics2.getHeight() * (collaborator.length);
+		g.drawString("Dosen Pembimbing:\n", (SCREEN_WIDTH - metrics1.stringWidth("Dosen Pembimbing:\n")) / 2,
+				dosenTitleY);
+		g.setFont(new Font("Calibri", 1, 30));
+		dosenY = dosenTitleY + metrics1.getHeight();
+		g.drawString("Abdul Munif, S.Kom., M.Sc.\n",
+				(SCREEN_WIDTH - metrics2.stringWidth("Abdul Munif, S.Kom., M.Sc.")) / 2, dosenY);
+
+		g.setFont(new Font("Calibri", 1, 40));
+		referencesTitleY = dosenY + metrics2.getHeight() + 20;
+		g.drawString("Referensi:\n", (SCREEN_WIDTH - metrics1.stringWidth("Referensi\n")) / 2, referencesTitleY);
+		String[] references = { "http://zetcode.com/javagames/snake/",
+				"http://forum.codecall.net/topic/50071-making-a-simple-high-score-system/" };
+		g.setFont(new Font("Calibri", 1, 30));
+		for (int i = 0; i < references.length; i++) {
+			g.drawString(references[i] + "\n", (SCREEN_WIDTH - metrics2.stringWidth(references[i])) / 2,
+					referencesTitleY + metrics2.getHeight() * i + 40);
+		}
 	}
 
 	@Override
@@ -358,6 +398,16 @@ public class GamePanel extends JPanel implements ActionListener {
 			int key = e.getKeyCode();
 			if (key == KeyEvent.VK_SPACE) {
 				if (running == 2) {
+					String playerName = JOptionPane.showInputDialog("Enter your name");
+					if (level == 0) {
+						easyHighscore.addScore(playerName, point);
+					} else if (level == 1) {
+						hardHighscore.addScore(playerName, point);
+					} else if (level == 2) {
+						expertHighscore.addScore(playerName, point);
+					} else {
+						impossibleHighscore.addScore(playerName, point);
+					}
 					running = 3;
 				} else if (running == 3) {
 					running = 4;
