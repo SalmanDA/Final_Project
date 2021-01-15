@@ -1,15 +1,30 @@
 package id.ac.its.snakegame;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.Random;
-import java.util.List;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.BorderLayout;
+import java.awt.Button;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-	public static final int SCREEN_WIDTH = 1000;
+	public static final int SCREEN_WIDTH = 700;
 	public static final int SCREEN_HEIGHT = 500;
 	public static final int UNIT_SIZE = 25;
 	public static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / (UNIT_SIZE * UNIT_SIZE);
@@ -29,8 +44,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	boolean poisonON = false;
 	int poisonCountDown = 0;
 
-	int running; // case of running {0 main menu, 1 game running, 2 Game Over, 5 highScore, 4
-					// Credit, 3 level
+	int running; // case of running {0 main menu, 1 game running, 2 Game Over, 3 highScore, 4 credit
 	Timer timer;
 	Random random;
 	private Apple apples;
@@ -73,6 +87,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		draw(g);
 	}
 
+	// Fungsi untuk menampilkan gambar
 	public void draw(Graphics g) {
 //		System.out.println("jalan");
 		if (running == 1) {
@@ -117,6 +132,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	}
 
+	// Fungsi untuk membuat apel baru setiap setelah dimakan
 	public void newApple() {
 		do {
 			appleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
@@ -134,6 +150,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		apples.setY(appleY);
 	}
 
+	// Fungsi untuk membuat magic apple baru
 	public void newMagicApple() {
 		do {
 			mAppleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
@@ -154,6 +171,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		mApple = new MagicApple(mAppleX, mAppleY, true);
 	}
 
+	// Fungsi untuk membuat racun-racun baru
 	public void newPoison() {
 		poisons = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
@@ -180,6 +198,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 
+	// Fungsi untuk mengatur terjadinya tabrakan setiap objeknya
 	public void checkCollisions() {
 		if (!snake.checkCollisions()) {
 			running = 2;
@@ -222,6 +241,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	}
 
+	// Memulai kembali permainan setelah game over
 	public void start() {
 		point = 0;
 		snake.setBodyLength(4);
@@ -233,6 +253,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		initGamePanel();
 	}
 
+	// Menampilkan skor yang didapatkan dan tulisan game over 
 	public void gameOver(Graphics g) {
 		// Score
 		g.setColor(Color.red);
@@ -247,6 +268,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
 	}
 
+	// Menaplikan Highscore untuk setiap kategori level
 	public void highscore(Graphics g) {
 		int scoreY, scoreX, titleY, tabWidth = 10;
 		String[] title = { "Easy level Highscore", "Hard level Highscore", "Expert level Highscore",
@@ -305,6 +327,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 
+	// Menampilkan halaman credit
 	public void credit(Graphics g) {
 		int collaboratorTitleY, collaboratorY, dosenY, dosenTitleY, referencesTitleY, referencesY, tabWidth = 10;
 
@@ -338,28 +361,31 @@ public class GamePanel extends JPanel implements ActionListener {
 		g.drawString("Referensi:\n", (SCREEN_WIDTH - metrics1.stringWidth("Referensi\n")) / 2, referencesTitleY);
 		String[] references = { "http://zetcode.com/javagames/snake/",
 				"http://forum.codecall.net/topic/50071-making-a-simple-high-score-system/" };
-		g.setFont(new Font("Calibri", 1, 30));
+		g.setFont(new Font("Calibri", 1, 20));
+		metrics2 = getFontMetrics(g.getFont());
 		for (int i = 0; i < references.length; i++) {
 			g.drawString(references[i] + "\n", (SCREEN_WIDTH - metrics2.stringWidth(references[i])) / 2,
 					referencesTitleY + metrics2.getHeight() * i + 40);
 		}
 	}
 
+	// Aksi yang dilakukan selama permainan berlangsung
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		if (running == 1) {
-//			checkCollisions();
+		if (running == 1) { // Selama permainan masih berlangsung
+			// Syarat munculnya magic apple
 			if (point % 4 == 0 && point != 0 && !mApple.isVisible() && !mAppleTrig) {
 				mAppleTrig = true;
 				newMagicApple();
 			} else if (point % 4 != 0) {
 				mAppleTrig = false;
 			}
+			// Batas waktu untuk mendapatkan magic apple
 			if (mApple.isVisible()) {
 				if (e.getSource() == timer) {
 					mAppleCountDown++;
-					System.out.println("timer: " + mAppleCountDown);
+//					System.out.println("timer: " + mAppleCountDown);
 				}
 				if (mAppleCountDown == 60) {
 					mAppleCountDown = 0;
@@ -367,14 +393,16 @@ public class GamePanel extends JPanel implements ActionListener {
 				}
 			}
 
+			// Syarat munculnya racun
 			if (point % 6 == 0 && point != 0 && !poisonON) {
 				newPoison();
 				poisonON = true;
 			}
+			// Mengatur lama waktu munculnya racun
 			if (poisonON) {
 				if (e.getSource() == timer) {
 					poisonCountDown++;
-					System.out.println("poison: " + poisonCountDown);
+//					System.out.println("poison: " + poisonCountDown);
 				}
 				if (poisonCountDown == 150) {
 					poisonCountDown = 0;
@@ -390,14 +418,15 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 		repaint();
 	}
-
+	
+	// Mengatur aksi yang dilakukan jika terdapat input keyboard dari pemain
 	public class MyKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
-			snake.keyPressed(e);
+			snake.keyPressed(e); // Mengatur gerak ular
 			int key = e.getKeyCode();
-			if (key == KeyEvent.VK_SPACE) {
-				if (running == 2) {
+			if (key == KeyEvent.VK_SPACE) { // Jika pemain menekan tombol space
+				if (running == 2) { // Jika pemain menekan tombol space di halaman game over -> halaman highscore
 					String playerName = JOptionPane.showInputDialog("Enter your name");
 					if (level == 0) {
 						easyHighscore.addScore(playerName, point);
@@ -409,9 +438,9 @@ public class GamePanel extends JPanel implements ActionListener {
 						impossibleHighscore.addScore(playerName, point);
 					}
 					running = 3;
-				} else if (running == 3) {
+				} else if (running == 3) { // Jika pemain menekan space di halaman higscore -> halaman credit
 					running = 4;
-				} else if (running == 4) {
+				} else if (running == 4) { // Jika pemain menekan space di halaman credit -> memilih level dan bermain kembali
 					timer.stop();
 					start();
 				}
