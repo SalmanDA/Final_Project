@@ -273,23 +273,36 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void credit(Graphics g) {
-		g.setColor(Color.WHITE);
-		g.setFont(new Font("Calibri", 1, 40));
-		FontMetrics metrics1 = getFontMetrics(g.getFont());
-		g.drawString("Collaborator:\n", (SCREEN_WIDTH - metrics1.stringWidth("Collaborator:")) / 2,
-				g.getFont().getSize());
-		g.setFont(new Font("Calibri", 1, 30));
-		FontMetrics metrics2 = getFontMetrics(g.getFont());
-		String[] collaborator = { "Salman Damai Alfariq 159", "Muhammad Fikri Sandi Pratama 195",
-				"Muhammad Rizky Widodo 216" };
-		for (int i = 0; i < collaborator.length; i++) {
-			g.drawString(collaborator[i] + "\n", (SCREEN_WIDTH - metrics2.stringWidth(collaborator[i])) / 2,
-					g.getFont().getSize());
-		}
-		g.drawString("Dosen Pembimbing:\n", (SCREEN_WIDTH - metrics1.stringWidth("Dosen Pembimbing:")) / 2,
-				g.getFont().getSize());
-		g.drawString("Abdul Munif, S.Kom., M.Sc.\n",
-				(SCREEN_WIDTH - metrics2.stringWidth("Abdul Munif, S.Kom., M.Sc.")) / 2, g.getFont().getSize());
+		int collaboratorTitleY, collaboratorY, dosenY, dosenTitleY, referencesTitleY, referencesY, tabWidth = 10;
+		  
+		  g.setColor(Color.WHITE);
+		  g.setFont(new Font("Calibri", 1, 40));  
+		  FontMetrics metrics1 = getFontMetrics(g.getFont());
+		  g.drawString("Collaborator:\n", (SCREEN_WIDTH - metrics1.stringWidth("Collaborator:"))/2, g.getFont().getSize());
+		  
+		  g.setFont(new Font("Calibri", 1, 30));  
+		  FontMetrics metrics2 = getFontMetrics(g.getFont());
+		  collaboratorY = 35 + metrics1.getHeight();
+		  String[] collaborator = {"Salman Damai Alfariq 159", "Muhammad Fikri Sandi Pratama 195", "Muhammad Rizky Widodo 216"};
+		  for(int i=0;i<collaborator.length;i++) {
+		   g.drawString(collaborator[i]+"\n", (SCREEN_WIDTH - metrics2.stringWidth(collaborator[i]))/2, collaboratorY+metrics2.getHeight()*i);
+		  }
+		  
+		  g.setFont(new Font("Calibri", 1, 40));  
+		  dosenTitleY = 20 + collaboratorY+metrics2.getHeight()*(collaborator.length);
+		  g.drawString("Dosen Pembimbing:\n", (SCREEN_WIDTH - metrics1.stringWidth("Dosen Pembimbing:\n"))/2, dosenTitleY);
+		  g.setFont(new Font("Calibri", 1, 30));   
+		  dosenY = dosenTitleY + metrics1.getHeight();
+		  g.drawString("Abdul Munif, S.Kom., M.Sc.\n", (SCREEN_WIDTH - metrics2.stringWidth("Abdul Munif, S.Kom., M.Sc."))/2, dosenY);
+
+		  g.setFont(new Font("Calibri", 1, 40));
+		  referencesTitleY = dosenY + metrics2.getHeight() + 20;
+		  g.drawString("Referensi:\n", (SCREEN_WIDTH - metrics1.stringWidth("Referensi\n"))/2, referencesTitleY);
+		  String[] references = {"http://zetcode.com/javagames/snake/","http://forum.codecall.net/topic/50071-making-a-simple-high-score-system/"};
+		  g.setFont(new Font("Calibri", 1, 30));  
+		  for(int i=0; i<references.length; i++) {
+		   g.drawString(references[i]+"\n", (SCREEN_WIDTH - metrics2.stringWidth(references[i]))/2, referencesTitleY + metrics2.getHeight()*i + 40);
+		  }
 	}
 
 	@Override
